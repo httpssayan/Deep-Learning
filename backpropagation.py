@@ -72,3 +72,35 @@ print(dW2)
 
 print("\ndb2:")
 print(db2)
+
+def compute_loss(y, y_hat):
+    epsilon = 1e-15
+    y_hat = np.clip(y_hat, epsilon, 1 - epsilon)
+
+    return -(y * np.log(y_hat) + (1 - y) * np.log(1 - y_hat))
+
+epsilon = 1e-5
+
+# Save original value
+original_value = W2[0, 0]
+
+# J(W + epsilon)
+W2[0, 0] = original_value + epsilon
+A2_plus, _ = forward_propagation(X, W1, b1, W2, b2)
+loss_plus = compute_loss(y, A2_plus)
+
+# J(W - epsilon)
+W2[0, 0] = original_value - epsilon
+A2_minus, _ = forward_propagation(X, W1, b1, W2, b2)
+loss_minus = compute_loss(y, A2_minus)
+
+# Restore original value
+W2[0, 0] = original_value
+
+# Numerical gradient
+numerical_gradient = (
+    loss_plus - loss_minus
+) / (2 * epsilon)
+
+print("Numerical gradient:", numerical_gradient)
+print("Analytical gradient:", dW2[0, 0])
